@@ -1,28 +1,37 @@
 <template>
   <div id="app">
     <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <br>
+    <button @click="getSQL">Get SQL</button>
+    <br>
+    SQL: {{sql}}
+    <br>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import { ipcRenderer } from 'electron';
 
 export default {
   name: 'app',
-  components: {
-    HelloWorld
-  }
-}
+  data: function() {
+    return {
+      sql: '',
+    };
+  },
+  created() {
+    ipcRenderer.on('window-sql', (event, sql) => {
+      console.log('THIS RAN SHOW SQL', sql);
+      this.sql = sql;
+    });
+  },
+  methods: {
+    fireSQL() {
+      ipcRenderer.send('fire-sql', 'get sql random string');
+    },
+    getSQL() {
+      ipcRenderer.send('get-sql', 'get sql random string');
+    },
+  },
+};
 </script>
-
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>

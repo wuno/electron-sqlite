@@ -1,0 +1,19 @@
+{
+  "end_of_line": "lf",
+  "indent_size": 2,
+  "indent_style": "space",
+  "insert_final_newline": true,
+  "trim_trailing_whitespace": true,
+  "printWidth": 80,
+  "tabWidth": 2,
+  "singleQuote": true,
+  "trailingComma": "all",
+  "bracketSpacing": true,
+  "parser": "babylon",
+  "semi": true,
+  "useTabs": false,
+  "proseWrap": "preserve",
+  "arrowParens": "avoid",
+  "htmlWhitespaceSensitivity": "css",
+  "endOfLine": "auto"
+}
