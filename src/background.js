@@ -1,7 +1,8 @@
 'use strict';
 
-// const sqlite3 = require('sqlite3').verbose();
-// const db = new sqlite3.Database('');
+// yarn add sqlite3 --build-from-source --sqlite_libname=sqlcipher --sqlite=brew --prefix--runtime=electron --target=4.0.0 --save-dev --dist-url=https://atom.io/download/electron
+const sqlite3 = require('sqlite3').verbose();
+var db = new sqlite3.Database('./src/encryptedDB.sql');
 
 import { app, protocol, BrowserWindow, ipcMain } from 'electron';
 import {
@@ -34,23 +35,73 @@ function runIt() {
   // win.webContents.send('run-sql', available.length, tasks.length);
 }
 
-// async function fireSQL() {
+// For sqlite3
+function fireSQL() {
+  try {
+    db.serialize(function () {
+      // db.run('CREATE TABLE IF NOT EXISTS clients (info TEXT)');
+      // var stmt = db.prepare('INSERT INTO clients VALUES (?)');
+      // for (var i = 0; i < 10; i++) {
+      //   stmt.run('wunO Background Client Number - ' + i);
+      // }
+      // stmt.finalize();
+      db.each('SELECT* FROM clients', function (err, row) {
+        const json = JSON.stringify(row.info);
+        win.webContents.send('window-sql', json);
+      });
+    });
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+function createDB() {
+  try {
+    // var stmt
+    //   , messages
+    //   ;
+    // db.run("PRAGMA KEY = 'secret'");
+    db.serialize(function () {
+      db.run("PRAGMA KEY = 'secret'");
+      db.run("PRAGMA CIPHER = 'aes-256-cbc'");
+      db.run('CREATE TABLE IF NOT EXISTS clients (info TEXT)');
+      var stmt = db.prepare('INSERT INTO clients VALUES (?)');
+      for (var i = 0; i < 10; i++) {
+        stmt.run('wunO Background Client Number - ' + i);
+      }
+      stmt.finalize();
+    });
+
+    // stmt = db.prepare("INSERT INTO messages(id, user, msg) VALUES (?, ?, ?)");
+    // messages = [
+    //   [1, 'coolaj86', 'this is test message number one'],
+    //   [2, 'ajthedj', 'this is test message number two'],
+    //   [3, 'coolaj86', 'this is test message number three']
+    // ];
+    // messages.forEach(function (msg) {
+    //   stmt.run(msg);
+    // });
+    // stmt.finalize();
+
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+// for sqlite-cipher
+// function fireSQL() {
 //   try {
-//     await db.serialize(function () {
-//       db.run('CREATE TABLE IF NOT EXISTS lorem (info TEXT)');
-//       var stmt = db.prepare('INSERT INTO lorem VALUES (?)');
-//       for (var i = 0; i < 10; i++) {
-//         stmt.run('From Background ' + i);
+//     db.get("SELECT * FROM messages", function (err, data) {
+//       if (err) {
+//         console.error(err);
+//         return;
 //       }
-//       stmt.finalize();
-//       db.each('SELECT rowid AS id, info FROM lorem', function (err, row) {
-//         const json = JSON.stringify(row.info);
-//         win.webContents.send('window-sql', json);
-//       });
+//       console.log(data);
+//       const json = JSON.stringify(data);
+//       win.webContents.send('window-sql', json);
 //     });
 //   } catch (err) {
 //     console.log(err);
-//     alert(err);
 //   }
 // }
 
@@ -73,6 +124,7 @@ protocol.registerStandardSchemes(['app'], {
 
 // Helper to create our main view BrowserWindow
 function createWindow() {
+  createDB();
   // Create the browser window.
   win = new BrowserWindow({
     width: 800,
@@ -135,9 +187,9 @@ app.on('ready', async () => {
     createBgWindow();
   }
 
-  // ipcMain.on('fire-sql', (event, arg) => {
-  //   fireSQL();
-  // });
+  ipcMain.on('fire-sql', (event, arg) => {
+    fireSQL();
+  });
 
   ipcMain.on('get-sql', (event, arg) => {
     console.log('get-sql - ', arg);

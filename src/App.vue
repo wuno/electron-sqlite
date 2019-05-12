@@ -2,7 +2,7 @@
   <div id="app">
     <img alt="Vue logo" src="./assets/logo.png">
     <br>
-    <button @click="getSQL">Get SQL</button>
+    <button @click="fireSQL">Get SQL</button>
     <br>
     SQL: {{sql}}
     <br>
