@@ -1,7 +1,7 @@
 'use strict';
 
-const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('');
+// const sqlite3 = require('sqlite3').verbose();
+// const db = new sqlite3.Database('');
 
 import { app, protocol, BrowserWindow, ipcMain } from 'electron';
 import {
@@ -34,25 +34,25 @@ function runIt() {
   // win.webContents.send('run-sql', available.length, tasks.length);
 }
 
-async function fireSQL() {
-  try {
-    await db.serialize(function() {
-      db.run('CREATE TABLE IF NOT EXISTS lorem (info TEXT)');
-      var stmt = db.prepare('INSERT INTO lorem VALUES (?)');
-      for (var i = 0; i < 10; i++) {
-        stmt.run('From Background ' + i);
-      }
-      stmt.finalize();
-      db.each('SELECT rowid AS id, info FROM lorem', function(err, row) {
-        const json = JSON.stringify(row.info);
-        win.webContents.send('window-sql', json);
-      });
-    });
-  } catch (err) {
-    console.log(err);
-    alert(err);
-  }
-}
+// async function fireSQL() {
+//   try {
+//     await db.serialize(function () {
+//       db.run('CREATE TABLE IF NOT EXISTS lorem (info TEXT)');
+//       var stmt = db.prepare('INSERT INTO lorem VALUES (?)');
+//       for (var i = 0; i < 10; i++) {
+//         stmt.run('From Background ' + i);
+//       }
+//       stmt.finalize();
+//       db.each('SELECT rowid AS id, info FROM lorem', function (err, row) {
+//         const json = JSON.stringify(row.info);
+//         win.webContents.send('window-sql', json);
+//       });
+//     });
+//   } catch (err) {
+//     console.log(err);
+//     alert(err);
+//   }
+// }
 
 // Helper to create our invisible WorkHorse BrowserWindow
 function createBgWindow() {
@@ -79,10 +79,12 @@ function createWindow() {
     height: 600,
   });
 
+  win.webContents.openDevTools()
+
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     win.loadURL(process.env.WEBPACK_DEV_SERVER_URL);
-    if (!process.env.IS_TEST) win.webContents.openDevTools();
+    // if (!process.env.IS_TEST) win.webContents.openDevTools();
   } else {
     createProtocol('app');
     // Load the index.html when not in development
@@ -133,9 +135,9 @@ app.on('ready', async () => {
     createBgWindow();
   }
 
-  ipcMain.on('fire-sql', (event, arg) => {
-    fireSQL();
-  });
+  // ipcMain.on('fire-sql', (event, arg) => {
+  //   fireSQL();
+  // });
 
   ipcMain.on('get-sql', (event, arg) => {
     console.log('get-sql - ', arg);

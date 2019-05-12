@@ -2,22 +2,17 @@
 
 ## Project setup
 ```
-yarn install
+yarn
 ```
 
 ### Compiles and hot-reloads for development
 ```
-yarn run serve
+yarn electron:serve
 ```
 
 ### Compiles and minifies for production
 ```
-yarn run build
-```
-
-### Run your tests
-```
-yarn run test
+yarn electron:build
 ```
 
 ### Lints and fixes files
@@ -25,5 +20,14 @@ yarn run test
 yarn run lint
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### Build Electron 
+# Must be on Mac OS to build for Mac OS
+```
+yarn electron:build -mwl
+```
+
+### Special Considerations
+# The sqlite3 bindings do not install correctly unless very specific versions of Electron and node-sqlite are being used together. In our case we are using, 
+
+- "sqlite3": "4.0.6"
+- "electron": "3.0.16"

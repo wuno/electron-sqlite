@@ -1,5 +1,5 @@
 const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('');
+const db = new sqlite3.Database('/sqlite3.db');
 const { ipcRenderer } = require('electron');
 
 function log(value) {
@@ -10,19 +10,19 @@ function ready() {
   ipcRenderer.send('ready');
 }
 
-async function work() {
+function work() {
   try {
-    await db.serialize(function() {
+    db.serialize(function () {
       db.run('CREATE TABLE IF NOT EXISTS lorem (info TEXT)');
       var stmt = db.prepare('INSERT INTO lorem VALUES (?)');
       for (var i = 0; i < 10; i++) {
         stmt.run('From Work Horse ' + i);
       }
       stmt.finalize();
-      db.each('SELECT rowid AS id, info FROM lorem', function(err, row) {
+      db.each('SELECT rowid AS id, info FROM lorem', function (err, row) {
         const json = JSON.stringify(row.info);
+        // log('SQL ----- ' + json);
         ipcRenderer.send('show-sql', json);
-        log('SQL ----- ' + json);
       });
     });
   } catch (err) {
@@ -38,7 +38,7 @@ ipcRenderer.on('run-sql', (event, arg) => {
   work();
   log(
     'finished ' +
-      JSON.stringify('Finished running SQL on a background thread.'),
+    JSON.stringify('Finished running SQL on a background thread.'),
   );
   ready();
 });
